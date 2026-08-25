@@ -502,15 +502,14 @@
 
   /* ================= 模块六：名师讲堂 ================= */
   function renderLecture(c){
-    const cnt=c=>LECTURES.filter(l=>l.cat===c).length;
     c.innerHTML=`
-      <div class="section-head">模块六 · 名师讲堂</div>
-      <div class="section-sub">提示词17-19：核心知识点精讲 · 高考题型解题技巧 · 易错点避坑指南（讲师话术脚本，共 ${LECTURES.length} 课，贯穿全套人教A版教材）。</div>
+      <div class="section-head">模块六 · 名师视频讲坛</div>
+      <div class="section-sub">真实讲课视频 · 来源哔哩哔哩公开教学视频（已授权公开嵌入）· 共 ${LECTURES.length} 课，贯穿全套人教A版高中数学。点击课程即可在系统内观看，也可前往原站支持 UP 主。</div>
       <div class="row" style="margin-bottom:14px" id="lecTabs">
         <button class="btn btn-primary btn-sm" data-c="all" onclick="Lec.filter(this)">全部（${LECTURES.length}）</button>
-        <button class="btn btn-ghost btn-sm" data-c="核心知识点精讲" onclick="Lec.filter(this)">精讲（${cnt('核心知识点精讲')}）</button>
-        <button class="btn btn-ghost btn-sm" data-c="高考题型解题技巧" onclick="Lec.filter(this)">技巧（${cnt('高考题型解题技巧')}）</button>
-        <button class="btn btn-ghost btn-sm" data-c="易错点避坑指南" onclick="Lec.filter(this)">避坑（${cnt('易错点避坑指南')}）</button>
+        <button class="btn btn-ghost btn-sm" data-c="精讲" onclick="Lec.filter(this)">精讲（${LECTURES.filter(l=>l.cat==='精讲').length}）</button>
+        <button class="btn btn-ghost btn-sm" data-c="技巧" onclick="Lec.filter(this)">技巧（${LECTURES.filter(l=>l.cat==='技巧').length}）</button>
+        <button class="btn btn-ghost btn-sm" data-c="避坑" onclick="Lec.filter(this)">避坑（${LECTURES.filter(l=>l.cat==='避坑').length}）</button>
       </div>
       <div id="lecList" class="grid cols-3"></div>
       <div id="lecView"></div>`;
@@ -520,15 +519,28 @@
   }
   const Lec={
     _filter:'all',
-    filter(btn){ $$('#lecTabs .btn').forEach(b=>b.className='btn btn-ghost btn-sm'); btn.className='btn btn-primary btn-sm'; this._filter=btn.dataset.c; this.renderList(); },
+    filter(btn){ $$('#lecTabs .btn').forEach(b=>b.className='btn btn-ghost btn-sm'); btn.className='btn btn-primary btn-sm'; this._filter=btn.dataset.c; this.renderList();
+      const list=LECTURES.filter(l=>this._filter==='all'||l.cat===this._filter); if(list[0]) this.open(list[0].id); },
     renderList(){ const list=LECTURES.filter(l=>this._filter==='all'||l.cat===this._filter);
       $('#lecList').innerHTML=list.map(l=>`<div class="card" style="margin:0;cursor:pointer" onclick="Lec.open('${l.id}')">
-        <div class="row" style="gap:8px"><span class="badge b-ext">${esc(l.cat)}</span><span class="muted" style="font-size:12px">${esc(l.dur)}</span></div>
-        <div style="font-weight:600;color:var(--c-primary);margin-top:6px">${esc(l.title)}</div></div>`).join('')||'<div class="empty">该分类暂无课程</div>'; },
+        <div class="row" style="gap:8px"><span class="badge b-ext">${esc(l.cat)}</span></div>
+        <div style="font-weight:600;color:#1E3A5F;margin-top:6px">${esc(l.title)}</div>
+        <div class="muted" style="font-size:12px;margin-top:4px">${esc(l.chapter||'')}</div>
+        <div class="row" style="gap:6px;margin-top:8px"><span style="font-size:11px;background:rgba(226,162,82,.16);color:#b8801f;padding:2px 8px;border-radius:20px;white-space:nowrap">📺 ${esc(l.teacher)}</span><span style="font-size:11px;background:rgba(30,58,95,.1);color:#1E3A5F;padding:2px 8px;border-radius:20px">B站</span></div>
+      </div>`).join('')||'<div class="empty">该分类暂无课程</div>'; },
     open(id){ const l=LECTURES.find(x=>x.id===id); if(!l) return;
+      const url='https://www.bilibili.com/video/'+l.bvid;
       $('#lecView').innerHTML=`<div class="card"><div class="card-title"><span class="bar"></span>${esc(l.title)}</div>
-        <div class="timeline">${l.blocks.map(b=>`<div class="tl-item"><div class="script-block"><div class="t">${esc(b.t)}</div>${esc(b.c)}</div></div>`).join('')}</div>
-        <p class="muted" style="font-size:12.5px;margin-top:10px">脚本为讲师授课话术示例，知识点100%匹配人教A版教材，语言口语化、可直录可直播。</p></div>`;
+        <div class="muted" style="font-size:13px;margin-bottom:10px">${esc(l.chapter||'')} · 主讲：${esc(l.teacher)} · 来源：哔哩哔哩</div>
+        <iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000;margin:4px 0" src="https://player.bilibili.com/player.html?bvid=${l.bvid}&page=${l.page||1}&high_quality=1&danmaku=0&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" referrerpolicy="no-referrer"></iframe>
+        <div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap">
+          <a class="btn btn-primary btn-sm" href="${url}" target="_blank" rel="noopener">▶ 去哔哩哔哩看原版 / 投币收藏</a>
+          <span class="muted" style="font-size:12px;align-self:center">若本页无法播放，请点上方按钮前往原站观看（部分 UP 主设置了禁止嵌入）。</span>
+        </div>
+        <div style="margin-top:14px;background:rgba(226,162,82,.08);border-radius:10px;padding:12px 16px">
+          <div style="font-weight:600;color:#1E3A5F;margin-bottom:6px">本节核心要点</div>
+          <ul style="margin:0;padding-left:18px;color:#333;font-size:14px;line-height:1.8">${l.points.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
+        </div></div>`;
       window.scrollTo(0,$('#lecView').offsetTop-60);
     }
   };
