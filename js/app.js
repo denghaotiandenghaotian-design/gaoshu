@@ -502,17 +502,29 @@
 
   /* ================= 模块六：名师讲堂 ================= */
   function renderLecture(c){
+    const cnt=c=>LECTURES.filter(l=>l.cat===c).length;
     c.innerHTML=`
       <div class="section-head">模块六 · 名师讲堂</div>
-      <div class="section-sub">提示词17-19：核心知识点精讲 · 高考题型解题技巧 · 易错点避坑指南（讲师话术脚本）。</div>
+      <div class="section-sub">提示词17-19：核心知识点精讲 · 高考题型解题技巧 · 易错点避坑指南（讲师话术脚本，共 ${LECTURES.length} 课，贯穿全套人教A版教材）。</div>
+      <div class="row" style="margin-bottom:14px" id="lecTabs">
+        <button class="btn btn-primary btn-sm" data-c="all" onclick="Lec.filter(this)">全部（${LECTURES.length}）</button>
+        <button class="btn btn-ghost btn-sm" data-c="核心知识点精讲" onclick="Lec.filter(this)">精讲（${cnt('核心知识点精讲')}）</button>
+        <button class="btn btn-ghost btn-sm" data-c="高考题型解题技巧" onclick="Lec.filter(this)">技巧（${cnt('高考题型解题技巧')}）</button>
+        <button class="btn btn-ghost btn-sm" data-c="易错点避坑指南" onclick="Lec.filter(this)">避坑（${cnt('易错点避坑指南')}）</button>
+      </div>
       <div id="lecList" class="grid cols-3"></div>
       <div id="lecView"></div>`;
-    $('#lecList').innerHTML=LECTURES.map(l=>`<div class="card" style="margin:0;cursor:pointer" onclick="Lec.open('${l.id}')">
-      <div class="row" style="gap:8px"><span class="badge b-ext">${esc(l.cat)}</span><span class="muted" style="font-size:12px">${esc(l.dur)}</span></div>
-      <div style="font-weight:600;color:var(--c-primary);margin-top:6px">${esc(l.title)}</div></div>`).join('');
+    Lec._filter='all';
+    Lec.renderList();
     Lec.open(LECTURES[0].id);
   }
   const Lec={
+    _filter:'all',
+    filter(btn){ $$('#lecTabs .btn').forEach(b=>b.className='btn btn-ghost btn-sm'); btn.className='btn btn-primary btn-sm'; this._filter=btn.dataset.c; this.renderList(); },
+    renderList(){ const list=LECTURES.filter(l=>this._filter==='all'||l.cat===this._filter);
+      $('#lecList').innerHTML=list.map(l=>`<div class="card" style="margin:0;cursor:pointer" onclick="Lec.open('${l.id}')">
+        <div class="row" style="gap:8px"><span class="badge b-ext">${esc(l.cat)}</span><span class="muted" style="font-size:12px">${esc(l.dur)}</span></div>
+        <div style="font-weight:600;color:var(--c-primary);margin-top:6px">${esc(l.title)}</div></div>`).join('')||'<div class="empty">该分类暂无课程</div>'; },
     open(id){ const l=LECTURES.find(x=>x.id===id); if(!l) return;
       $('#lecView').innerHTML=`<div class="card"><div class="card-title"><span class="bar"></span>${esc(l.title)}</div>
         <div class="timeline">${l.blocks.map(b=>`<div class="tl-item"><div class="script-block"><div class="t">${esc(b.t)}</div>${esc(b.c)}</div></div>`).join('')}</div>
