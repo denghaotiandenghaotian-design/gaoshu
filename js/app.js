@@ -451,7 +451,7 @@
   function renderPast(c){
     c.innerHTML=`
       <div class="section-head">模块五 · 5年真题解析</div>
-      <div class="section-sub">提示词14-16：逐题深度解析 · 考情统计 · 命题规律与趋势（2021-2025 河南新课标Ⅰ卷）。</div>
+      <div class="section-sub">提示词14-16：逐题深度解析 · 考情统计 · 命题规律与趋势。真题库现为双轨：河南真实考卷（全国乙卷·理 2021-2024 ＋ 新高考Ⅰ卷 2025）＋ 新高考Ⅰ卷 2021-2024（改革参考）。本模块统计以新高考Ⅰ卷视角归纳，备考请以官方原卷为准。</div>
       <div class="row" style="margin-bottom:14px">
         <button class="btn btn-primary btn-sm" onclick="Past.stats()">⑮ 考情统计</button>
         <button class="btn btn-primary btn-sm" onclick="Past.trend()">⑯ 命题趋势</button>
